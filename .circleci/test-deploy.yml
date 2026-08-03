@@ -1,4 +1,5 @@
 version: 2.1
+
 orbs:
   bandit: orbss/bandit@dev:<<pipeline.git.revision>>
   orb-tools: circleci/orb-tools@11.1
@@ -12,68 +13,259 @@ jobs:
     executor: bandit/default
     steps:
       - checkout
+
       - bandit/install:
           extras: toml
-      # tests/clean is free of findings, so bandit has to exit 0.
+          version: "1.9.4"
+
+      - run:
+          name: Create clean Bandit fixture
+          command: |
+            set -euo pipefail
+
+            mkdir -p tests/clean
+
+            cat > tests/clean/secure_hash.py \<<'PY'
+            """Clean fixture for Bandit tests."""
+
+            import hashlib
+
+
+            def generate_digest(value: str) -> str:
+                return hashlib.sha256(value.encode("utf-8")).hexdigest()
+            PY
+
+            test -s tests/clean/secure_hash.py
+            python -m py_compile tests/clean/secure_hash.py
+
+      # Scan the fixture file directly. Recursive mode is unnecessary.
       - bandit/execute:
-          targets: tests/clean
+          recursive: false
+          targets: tests/clean/secure_hash.py
+
   parameter-tests:
     executor: bandit/default
     steps:
       - checkout
+
       - bandit/install:
           extras: toml
-      # tests/insecure has findings, exit-zero keeps the job alive so that
-      # the report can be stored.
+          version: "1.9.4"
+
+      - run:
+          name: Create Bandit test fixtures
+          command: |
+            set -euo pipefail
+
+            mkdir -p tests/clean tests/insecure
+
+            cat > tests/insecure/weak_hash.py \<<'PY'
+            """Intentionally insecure fixture for Bandit tests."""
+
+            import hashlib
+
+
+            def generate_digest(value: str) -> str:
+                return hashlib.md5(value.encode("utf-8")).hexdigest()
+            PY
+
+            cat > tests/clean/secure_hash.py \<<'PY'
+            """Clean fixture for Bandit tests."""
+
+            import hashlib
+
+
+            def generate_digest(value: str) -> str:
+                return hashlib.sha256(value.encode("utf-8")).hexdigest()
+            PY
+
+            test -s tests/insecure/weak_hash.py
+            test -s tests/clean/secure_hash.py
+
+            python -m py_compile \
+              tests/insecure/weak_hash.py \
+              tests/clean/secure_hash.py
+
+            echo "Created test fixtures:"
+            find tests -type f -name '*.py' -print
+
+            echo "Insecure fixture:"
+            sed -n '1,120p' tests/insecure/weak_hash.py
+
+      # Scan the exact file instead of relying on recursive directory discovery.
       - bandit/execute:
           exit-zero: true
           format: json
           output-file: reports/bandit.json
-          targets: tests/insecure
+          recursive: false
+          targets: tests/insecure/weak_hash.py
+
+      - run:
+          name: Verify Bandit JSON report
+          command: |
+            set -euo pipefail
+
+            test -s reports/bandit.json
+
+            echo "Bandit JSON report:"
+            cat reports/bandit.json
+
+            python - \<<'PY'
+            import json
+            from pathlib import Path
+
+            report_path = Path("reports/bandit.json")
+            report = json.loads(
+                report_path.read_text(encoding="utf-8")
+            )
+
+            errors = report.get("errors", [])
+            if errors:
+                raise SystemExit(
+                    f"Bandit reported scan errors: {errors}"
+                )
+
+            metrics = report.get("metrics", {})
+            totals = metrics.get("_totals", {})
+            scanned_lines = totals.get("loc", 0)
+
+            if scanned_lines == 0:
+                raise SystemExit(
+                    "Bandit did not scan any Python source lines. "
+                    f"metrics={metrics}"
+                )
+
+            results = report.get("results", [])
+            if not results:
+                raise SystemExit(
+                    "Expected at least one Bandit finding in "
+                    "tests/insecure/weak_hash.py"
+                )
+
+            test_ids = {
+                result.get("test_id")
+                for result in results
+                if result.get("test_id")
+            }
+
+            if "B324" not in test_ids:
+                raise SystemExit(
+                    "Expected B324 in Bandit findings, "
+                    f"but detected: {sorted(test_ids)}"
+                )
+
+            filenames = {
+                result.get("filename")
+                for result in results
+                if result.get("filename")
+            }
+
+            print(f"Scanned source lines: {scanned_lines}")
+            print(f"Verified {len(results)} finding(s)")
+            print(f"Detected test IDs: {sorted(test_ids)}")
+            print(f"Scanned files: {sorted(filenames)}")
+            PY
+
       - store_artifacts:
           path: reports
-      # B324 is the only high severity finding in the fixture, skipping it
-      # leaves nothing to report and bandit exits 0 without exit-zero.
+
+      # Verify that B324 can be skipped.
       - bandit/execute:
+          recursive: false
           severity-level: high
           skips: B324
-          targets: tests/insecure
-      # The excluded directory is the only one with findings.
+          targets: tests/insecure/weak_hash.py
+
+      # Verify directory scanning and excluded-paths independently.
       - bandit/execute:
           excluded-paths: tests/insecure
           targets: tests
+
   install-tests:
     docker:
       - image: cimg/python:3.13
     steps:
       - checkout
+
       - bandit/install:
           extras: toml
+          version: "1.9.4"
+
+      - run:
+          name: Create clean Bandit fixture
+          command: |
+            set -euo pipefail
+
+            mkdir -p tests/clean
+
+            cat > tests/clean/secure_hash.py \<<'PY'
+            """Clean fixture for Bandit tests."""
+
+            import hashlib
+
+
+            def generate_digest(value: str) -> str:
+                return hashlib.sha256(value.encode("utf-8")).hexdigest()
+            PY
+
+            test -s tests/clean/secure_hash.py
+
       - bandit/execute:
-          targets: tests/clean
+          recursive: false
+          targets: tests/clean/secure_hash.py
+
   resource-class-test:
     executor:
       name: bandit/default
       resource_class: medium
     steps:
       - checkout
+
       - bandit/install:
           extras: toml
+          version: "1.9.4"
+
+      - run:
+          name: Create clean Bandit fixture
+          command: |
+            set -euo pipefail
+
+            mkdir -p tests/clean
+
+            cat > tests/clean/secure_hash.py \<<'PY'
+            """Clean fixture for Bandit tests."""
+
+            import hashlib
+
+
+            def generate_digest(value: str) -> str:
+                return hashlib.sha256(value.encode("utf-8")).hexdigest()
+            PY
+
+            test -s tests/clean/secure_hash.py
+
       - bandit/execute:
-          targets: tests/clean
+          recursive: false
+          targets: tests/clean/secure_hash.py
+
 workflows:
   test-deploy:
     jobs:
       - command-tests:
           filters: *filters
+
       - parameter-tests:
           filters: *filters
+
       - install-tests:
           filters: *filters
+
       - resource-class-test:
           filters: *filters
+
       - orb-tools/pack:
           filters: *filters
+
       - orb-tools/publish:
           orb-name: orbss/bandit
           vcs-type: << pipeline.project.type >>

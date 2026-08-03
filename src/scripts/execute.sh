@@ -3,7 +3,18 @@ set -eo pipefail
 
 BANDIT_ARGS=()
 
-if [ "${PARAM_RECURSIVE}" = 'true' ]; then
+is_true() {
+  case "${1,,}" in
+    true | 1 | yes | on)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+if is_true "${PARAM_RECURSIVE}"; then
   BANDIT_ARGS+=('--recursive')
 fi
 
@@ -46,19 +57,24 @@ if [ -n "${PARAM_OUTPUT_FILE}" ]; then
   BANDIT_ARGS+=('--output' "${PARAM_OUTPUT_FILE}")
 fi
 
-if [ "${PARAM_EXIT_ZERO}" = 'true' ]; then
+if is_true "${PARAM_EXIT_ZERO}"; then
   BANDIT_ARGS+=('--exit-zero')
 fi
 
-# Word splitting is intended here, extra-args may hold several flags.
+# Word splitting is intended here because extra-args may contain several flags.
 # shellcheck disable=SC2206
 if [ -n "${PARAM_EXTRA_ARGS}" ]; then
   BANDIT_ARGS+=(${PARAM_EXTRA_ARGS})
 fi
 
-# Word splitting is intended here, targets may hold several paths.
+# Word splitting is intended here because targets may contain several paths.
 # shellcheck disable=SC2206
 TARGETS=(${PARAM_TARGETS})
 
-echo "bandit ${BANDIT_ARGS[*]} ${TARGETS[*]}"
+printf 'PARAM_RECURSIVE=%q\n' "${PARAM_RECURSIVE}"
+printf 'PARAM_EXIT_ZERO=%q\n' "${PARAM_EXIT_ZERO}"
+printf 'Command:'
+printf ' %q' bandit "${BANDIT_ARGS[@]}" "${TARGETS[@]}"
+printf '\n'
+
 bandit "${BANDIT_ARGS[@]}" "${TARGETS[@]}"
