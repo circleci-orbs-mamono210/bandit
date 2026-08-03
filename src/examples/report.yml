@@ -13,6 +13,7 @@ usage:
       executor: bandit/default
       steps:
         - checkout
+        - bandit/install
         - bandit/execute:
             excluded-paths: tests,.venv
             exit-zero: true

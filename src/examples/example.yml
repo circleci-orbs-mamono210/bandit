@@ -11,6 +11,7 @@ usage:
       executor: bandit/default
       steps:
         - checkout
+        - bandit/install
         - bandit/execute
   workflows:
     use-my-orb:
