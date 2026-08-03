@@ -1,0 +1,112 @@
+---
+description: >
+  Execute bandit
+parameters:
+  baseline:
+    default: ''
+    description: >
+      Path of a JSON report to compare against, so that only new findings are
+      reported (bandit '--baseline').
+    type: string
+  confidence-level:
+    default: all
+    description: >
+      Report only issues of this confidence level or higher
+      (bandit '--confidence-level').
+    enum: ["all", "low", "medium", "high"]
+    type: enum
+  config-file:
+    default: ''
+    description: >
+      Path of a bandit config file (bandit '--configfile'). Passing
+      'pyproject.toml' requires the 'toml' extra, see the 'install' command.
+    type: string
+  excluded-paths:
+    default: ''
+    description: >
+      Comma separated list of paths, glob patterns supported, to exclude from
+      the scan (bandit '--exclude'). These are added to the paths bandit
+      excludes by default.
+    type: string
+  exit-zero:
+    default: false
+    description: >
+      Exit with 0 even when issues are found (bandit '--exit-zero'), so that
+      the job does not fail on findings.
+    type: boolean
+  extra-args:
+    default: ''
+    description: >
+      Extra arguments appended to the bandit invocation verbatim, for options
+      this command does not expose.
+    type: string
+  format:
+    default: screen
+    description: >
+      Output format (bandit '--format').
+    enum: ["csv", "custom", "html", "json", "screen", "txt", "xml", "yaml"]
+    type: enum
+  ini-path:
+    default: ''
+    description: >
+      Path of a '.bandit' file that supplies command line arguments
+      (bandit '--ini').
+    type: string
+  output-file:
+    default: ''
+    description: >
+      Write the report to this path (bandit '--output'). Parent directories
+      are created. Empty writes to stdout.
+    type: string
+  recursive:
+    default: true
+    description: >
+      Find and process files in subdirectories of the targets
+      (bandit '--recursive').
+    type: boolean
+  severity-level:
+    default: all
+    description: >
+      Report only issues of this severity level or higher
+      (bandit '--severity-level').
+    enum: ["all", "low", "medium", "high"]
+    type: enum
+  skips:
+    default: ''
+    description: >
+      Comma separated list of test IDs to skip, for example 'B101,B601'
+      (bandit '--skip').
+    type: string
+  targets:
+    default: '.'
+    description: >
+      Space separated list of source files or directories to scan.
+    type: string
+  tests:
+    default: ''
+    description: >
+      Comma separated list of test IDs to run, for example 'B301,B324'.
+      Empty runs every test (bandit '--tests').
+    type: string
+steps:
+  - run:
+      name: Show bandit version
+      command: <<include(scripts/show-version.sh)>>
+  - run:
+      name: Execute bandit
+      environment:
+        PARAM_BASELINE: '<<parameters.baseline>>'
+        PARAM_CONFIDENCE_LEVEL: '<<parameters.confidence-level>>'
+        PARAM_CONFIG_FILE: '<<parameters.config-file>>'
+        PARAM_EXCLUDED_PATHS: '<<parameters.excluded-paths>>'
+        PARAM_EXIT_ZERO: '<<parameters.exit-zero>>'
+        PARAM_EXTRA_ARGS: '<<parameters.extra-args>>'
+        PARAM_FORMAT: '<<parameters.format>>'
+        PARAM_INI_PATH: '<<parameters.ini-path>>'
+        PARAM_OUTPUT_FILE: '<<parameters.output-file>>'
+        PARAM_RECURSIVE: '<<parameters.recursive>>'
+        PARAM_SEVERITY_LEVEL: '<<parameters.severity-level>>'
+        PARAM_SKIPS: '<<parameters.skips>>'
+        PARAM_TARGETS: '<<parameters.targets>>'
+        PARAM_TESTS: '<<parameters.tests>>'
+      command: <<include(scripts/execute.sh)>>

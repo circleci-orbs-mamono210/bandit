@@ -1,0 +1,14 @@
+---
+description: >
+  CircleCI executor bandit
+docker:
+  - image: '<<parameters.image>>'
+parameters:
+  image:
+    default: cimg/python:3.14
+    type: string
+  resource_class:
+    default: small
+    enum: ["small", "medium", "medium+", "large"]
+    type: enum
+resource_class: '<<parameters.resource_class>>'

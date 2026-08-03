@@ -1,0 +1,92 @@
+version: 2.1
+orbs:
+  bandit: orbss/bandit@dev:<<pipeline.git.revision>>
+  orb-tools: circleci/orb-tools@11.1
+
+filters: &filters
+  tags:
+    only: /.*/
+
+jobs:
+  command-tests:
+    executor: bandit/default
+    steps:
+      - checkout
+      - bandit/install:
+          extras: toml
+      # tests/clean is free of findings, so bandit has to exit 0.
+      - bandit/execute:
+          targets: tests/clean
+  parameter-tests:
+    executor: bandit/default
+    steps:
+      - checkout
+      - bandit/install:
+          extras: toml
+      # tests/insecure has findings, exit-zero keeps the job alive so that
+      # the report can be stored.
+      - bandit/execute:
+          exit-zero: true
+          format: json
+          output-file: reports/bandit.json
+          targets: tests/insecure
+      - store_artifacts:
+          path: reports
+      # B324 is the only high severity finding in the fixture, skipping it
+      # leaves nothing to report and bandit exits 0 without exit-zero.
+      - bandit/execute:
+          severity-level: high
+          skips: B324
+          targets: tests/insecure
+      # The excluded directory is the only one with findings.
+      - bandit/execute:
+          excluded-paths: tests/insecure
+          targets: tests
+  install-tests:
+    docker:
+      - image: cimg/python:3.13
+    steps:
+      - checkout
+      - bandit/install:
+          extras: toml
+      - bandit/execute:
+          targets: tests/clean
+  resource-class-test:
+    executor:
+      name: bandit/default
+      resource_class: medium
+    steps:
+      - checkout
+      - bandit/install:
+          extras: toml
+      - bandit/execute:
+          targets: tests/clean
+workflows:
+  test-deploy:
+    jobs:
+      - command-tests:
+          filters: *filters
+      - parameter-tests:
+          filters: *filters
+      - install-tests:
+          filters: *filters
+      - resource-class-test:
+          filters: *filters
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/publish:
+          orb-name: orbss/bandit
+          vcs-type: << pipeline.project.type >>
+          pub-type: production
+          requires:
+            - orb-tools/pack
+            - command-tests
+            - install-tests
+            - parameter-tests
+            - resource-class-test
+          context: <publishing-context>
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/

@@ -1,0 +1,30 @@
+---
+description: >
+  Keep a machine readable report as a build artifact and gate the job on
+  medium or higher severity findings only. The reporting run uses
+  'exit-zero' so that the artifact is stored even when issues are found,
+  the second run is the one that decides whether the job passes.
+usage:
+  version: 2.1
+  orbs:
+    bandit: orbss/bandit@x.y.z
+  jobs:
+    execute-bandit:
+      executor: bandit/default
+      steps:
+        - checkout
+        - bandit/execute:
+            excluded-paths: tests,.venv
+            exit-zero: true
+            format: json
+            output-file: reports/bandit.json
+        - store_artifacts:
+            path: reports
+        - bandit/execute:
+            confidence-level: medium
+            excluded-paths: tests,.venv
+            severity-level: medium
+  workflows:
+    use-my-orb:
+      jobs:
+        - execute-bandit

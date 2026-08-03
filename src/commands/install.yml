@@ -1,0 +1,24 @@
+---
+description: >
+  Install bandit with pip. Only needed when the executor image does not
+  bundle bandit already, for example when running on 'cimg/python'.
+parameters:
+  extras:
+    default: ''
+    description: >
+      Comma separated list of pip extras, for example 'toml' to let bandit
+      read its settings from 'pyproject.toml'. Empty installs no extras.
+    type: string
+  version:
+    default: ''
+    description: >
+      Version of bandit to install, for example '1.9.4'. Empty installs the
+      latest release.
+    type: string
+steps:
+  - run:
+      name: Install bandit
+      environment:
+        PARAM_EXTRAS: '<<parameters.extras>>'
+        PARAM_VERSION: '<<parameters.version>>'
+      command: <<include(scripts/install.sh)>>

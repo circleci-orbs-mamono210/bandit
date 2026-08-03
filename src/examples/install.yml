@@ -1,0 +1,24 @@
+---
+description: >
+  Run bandit on an executor that does not bundle it, such as the CircleCI
+  Python convenience image. The 'toml' extra lets bandit read its settings
+  from the '[tool.bandit]' table of 'pyproject.toml'.
+usage:
+  version: 2.1
+  orbs:
+    bandit: orbss/bandit@x.y.z
+  jobs:
+    execute-bandit:
+      docker:
+        - image: cimg/python:3.13
+      steps:
+        - checkout
+        - bandit/install:
+            extras: toml
+            version: 1.9.4
+        - bandit/execute:
+            config-file: pyproject.toml
+  workflows:
+    use-my-orb:
+      jobs:
+        - execute-bandit

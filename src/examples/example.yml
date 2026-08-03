@@ -1,0 +1,18 @@
+---
+description: >
+  Execute bandit against the checked out code with the default parameters.
+  The job fails as soon as bandit reports a single issue.
+usage:
+  version: 2.1
+  orbs:
+    bandit: orbss/bandit@x.y.z
+  jobs:
+    execute-bandit:
+      executor: bandit/default
+      steps:
+        - checkout
+        - bandit/execute
+  workflows:
+    use-my-orb:
+      jobs:
+        - execute-bandit
