@@ -1,6 +1,7 @@
 ---
 description: >
-  CircleCI executor bandit
+  CircleCI Python executor for running Bandit. This executor does not
+  include Bandit, so run bandit/install before bandit/execute.
 docker:
   - image: '<<parameters.image>>'
 parameters:
