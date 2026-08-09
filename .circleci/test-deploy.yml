@@ -117,6 +117,14 @@ jobs:
           skips: B324
           targets: tests/insecure/main.py
 
+      # Verify that config-file loads the committed Bandit configuration.
+      # The config skips B324, which is the only HIGH severity finding.
+      - bandit/execute:
+          config-file: tests/config/bandit.yaml
+          recursive: false
+          severity-level: high
+          targets: tests/insecure/main.py
+
       # Verify directory scanning and excluded-paths independently.
       - bandit/execute:
           excluded-paths: tests/insecure
