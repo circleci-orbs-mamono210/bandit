@@ -276,7 +276,7 @@ workflows:
             - install-tests
             - parameter-tests
             - resource-class-test
-          context: <publishing-context>
+          context: CIRCLECI_ORBS
           filters:
             branches:
               ignore: /.*/
