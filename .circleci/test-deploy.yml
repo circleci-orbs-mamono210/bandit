@@ -18,30 +18,10 @@ jobs:
           extras: toml
           version: "1.9.4"
 
-      - run:
-          name: Create clean Bandit fixture
-          command: |
-            set -euo pipefail
-
-            mkdir -p tests/clean
-
-            cat > tests/clean/secure_hash.py \<<'PY'
-            """Clean fixture for Bandit tests."""
-
-            import hashlib
-
-
-            def generate_digest(value: str) -> str:
-                return hashlib.sha256(value.encode("utf-8")).hexdigest()
-            PY
-
-            test -s tests/clean/secure_hash.py
-            python -m py_compile tests/clean/secure_hash.py
-
-      # Scan the fixture file directly. Recursive mode is unnecessary.
+      # Scan the committed clean fixture directly.
       - bandit/execute:
           recursive: false
-          targets: tests/clean/secure_hash.py
+          targets: tests/clean/main.py
 
   parameter-tests:
     executor: bandit/default
@@ -52,53 +32,13 @@ jobs:
           extras: toml
           version: "1.9.4"
 
-      - run:
-          name: Create Bandit test fixtures
-          command: |
-            set -euo pipefail
-
-            mkdir -p tests/clean tests/insecure
-
-            cat > tests/insecure/weak_hash.py \<<'PY'
-            """Intentionally insecure fixture for Bandit tests."""
-
-            import hashlib
-
-
-            def generate_digest(value: str) -> str:
-                return hashlib.md5(value.encode("utf-8")).hexdigest()
-            PY
-
-            cat > tests/clean/secure_hash.py \<<'PY'
-            """Clean fixture for Bandit tests."""
-
-            import hashlib
-
-
-            def generate_digest(value: str) -> str:
-                return hashlib.sha256(value.encode("utf-8")).hexdigest()
-            PY
-
-            test -s tests/insecure/weak_hash.py
-            test -s tests/clean/secure_hash.py
-
-            python -m py_compile \
-              tests/insecure/weak_hash.py \
-              tests/clean/secure_hash.py
-
-            echo "Created test fixtures:"
-            find tests -type f -name '*.py' -print
-
-            echo "Insecure fixture:"
-            sed -n '1,120p' tests/insecure/weak_hash.py
-
-      # Scan the exact file instead of relying on recursive directory discovery.
+      # Generate a JSON report from the committed insecure fixture.
       - bandit/execute:
           exit-zero: true
           format: json
           output-file: reports/bandit.json
           recursive: false
-          targets: tests/insecure/weak_hash.py
+          targets: tests/insecure/main.py
 
       - run:
           name: Verify Bandit JSON report
@@ -139,7 +79,7 @@ jobs:
             if not results:
                 raise SystemExit(
                     "Expected at least one Bandit finding in "
-                    "tests/insecure/weak_hash.py"
+                    "tests/insecure/main.py"
                 )
 
             test_ids = {
@@ -170,11 +110,12 @@ jobs:
           path: reports
 
       # Verify that B324 can be skipped.
+      # B324 is the only HIGH severity finding in the fixture.
       - bandit/execute:
           recursive: false
           severity-level: high
           skips: B324
-          targets: tests/insecure/weak_hash.py
+          targets: tests/insecure/main.py
 
       # Verify directory scanning and excluded-paths independently.
       - bandit/execute:
@@ -191,28 +132,9 @@ jobs:
           extras: toml
           version: "1.9.4"
 
-      - run:
-          name: Create clean Bandit fixture
-          command: |
-            set -euo pipefail
-
-            mkdir -p tests/clean
-
-            cat > tests/clean/secure_hash.py \<<'PY'
-            """Clean fixture for Bandit tests."""
-
-            import hashlib
-
-
-            def generate_digest(value: str) -> str:
-                return hashlib.sha256(value.encode("utf-8")).hexdigest()
-            PY
-
-            test -s tests/clean/secure_hash.py
-
       - bandit/execute:
           recursive: false
-          targets: tests/clean/secure_hash.py
+          targets: tests/clean/main.py
 
   resource-class-test:
     executor:
@@ -225,28 +147,9 @@ jobs:
           extras: toml
           version: "1.9.4"
 
-      - run:
-          name: Create clean Bandit fixture
-          command: |
-            set -euo pipefail
-
-            mkdir -p tests/clean
-
-            cat > tests/clean/secure_hash.py \<<'PY'
-            """Clean fixture for Bandit tests."""
-
-            import hashlib
-
-
-            def generate_digest(value: str) -> str:
-                return hashlib.sha256(value.encode("utf-8")).hexdigest()
-            PY
-
-            test -s tests/clean/secure_hash.py
-
       - bandit/execute:
           recursive: false
-          targets: tests/clean/secure_hash.py
+          targets: tests/clean/main.py
 
 workflows:
   test-deploy:
