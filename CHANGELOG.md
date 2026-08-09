@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed the CircleCI Context used for production publishing in `.circleci/test-deploy.yml`, replacing the `<publishing-context>` placeholder with `CIRCLECI_ORBS`.
+
 ## [0.0.3] - 2026-08-09
 
 ### Added
