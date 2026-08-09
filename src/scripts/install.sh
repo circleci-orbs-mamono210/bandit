@@ -12,4 +12,4 @@ if [ -n "${PARAM_VERSION}" ]; then
 fi
 
 echo "Installing ${PACKAGE}"
-pip install --upgrade "${PACKAGE}"
+python -m pip install --upgrade "${PACKAGE}"
