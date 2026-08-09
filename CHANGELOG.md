@@ -7,31 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-* Fixed the CircleCI Context used for production publishing in `.circleci/test-deploy.yml`, replacing the `<publishing-context>` placeholder with `CIRCLECI_ORBS`.
-
-## [0.0.3] - 2026-08-09
+The Orb source has not changed since 0.0.6, so this section contains repository
+changes only.
 
 ### Added
 
-* Added a verification step to the integration tests that parses the Bandit JSON report and asserts that no scan errors were reported, that at least one source line was scanned, and that `B324` is present in the findings.
-* Added the `tests/clean/secure_hash.py` fixture so a clean scan is covered by a file that Bandit is expected to pass.
-* Added `bandit/install` to the default and report usage examples, which previously ran `bandit/execute` on an executor that does not ship Bandit.
+* Added this changelog.
+* Expanded the README with the Orb registry link, a quick start, and parameter documentation for `bandit/install`, `bandit/execute` and `bandit/default`.
 
 ### Changed
 
-* Rewrote the Orb description in `src/@orb.yml` so it describes the install and execute commands and the configurable Python executor, instead of referring to a `ghcr.io` executor image that the Orb no longer uses.
+* Changed the production publishing job to use the `CIRCLECI_ORBS` context, instead of the `<publishing-context>` placeholder left in place by the Orb development kit.
+* Consolidated the integration-test fixtures into files under `tests/`, instead of generating them from heredocs inside each job.
+
+## [0.0.6] - 2026-08-05
+
+### Changed
+
 * Clarified the `bandit/default` executor description to state that Bandit is not preinstalled and that `bandit/install` has to run before `bandit/execute`.
-* Accepted `1`, `yes` and `on`, in any letter case, as true values for the `exit-zero` and `recursive` boolean parameters.
-* Replaced the plain command echo in `src/scripts/execute.sh` with a `printf '%q'` trace that shows the resolved Bandit invocation together with the received `recursive` and `exit-zero` values, so a quoting problem is visible in the CircleCI log.
-* Changed the integration tests to generate their fixtures inside the job and to scan explicit file paths with `recursive: false`, instead of relying on recursive discovery over the checked-out `tests` directory.
-* Pinned the Bandit version installed by the integration tests to 1.9.4.
-* Expanded the README with the Orb registry link, a quick start, and parameter documentation for `bandit/install`, `bandit/execute` and `bandit/default`.
 
 ### Fixed
 
 * Fixed the organisation name placeholder left in `LICENSE`.
+
+## [0.0.5] - 2026-08-03
+
+### Added
+
+* Added a verification step to the integration tests that parses the Bandit JSON report and asserts that no scan errors were reported, that at least one source line was scanned, and that `B324` is present in the findings.
+* Added a clean fixture that Bandit is expected to pass, so a passing scan is covered as well as a failing one.
+
+### Changed
+
+* Accepted `1`, `yes` and `on`, in any letter case, as true values for the `exit-zero` and `recursive` parameters.
+* Replaced the plain command echo in `src/scripts/execute.sh` with a `printf '%q'` trace that shows the resolved Bandit invocation together with the received `recursive` and `exit-zero` values, so a quoting problem is visible in the CircleCI log.
+* Changed the integration tests to scan explicit file paths with `recursive: false`, instead of relying on recursive discovery over the checked-out `tests` directory.
+* Pinned the Bandit version installed by the integration tests to 1.9.4.
+
+## [0.0.4] - 2026-08-03
+
+### Fixed
+
+* Added `bandit/install` to the default and report usage examples, which previously ran `bandit/execute` on an executor that does not ship Bandit.
+
+## [0.0.3] - 2026-08-03
+
+### Changed
+
+* Rewrote the Orb description in `src/@orb.yml` so it describes the install and execute commands and the configurable Python executor, instead of referring to a `ghcr.io` executor image that the Orb does not use.
 
 ## [0.0.2] - 2026-08-03
 
@@ -59,6 +82,9 @@ Initial release of the Bandit CircleCI Orb.
 * Added Orb linting, packing, review and ShellCheck to the development pipeline.
 * Added production publishing from Semantic Versioning tags.
 
-[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.3...HEAD
+[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.6...HEAD
+[0.0.6]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.5...v0.0.6
+[0.0.5]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.4...v0.0.5
+[0.0.4]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/circleci-orbs-mamono210/bandit/releases/tag/v0.0.2
