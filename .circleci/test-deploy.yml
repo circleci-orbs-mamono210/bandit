@@ -156,6 +156,14 @@ jobs:
           recursive: false
           targets: tests/insecure/main.py
 
+      # Verify that tests limits Bandit to the selected test IDs.
+      # Only B101 is selected, and it is below the HIGH severity threshold.
+      - bandit/execute:
+          recursive: false
+          severity-level: high
+          targets: tests/insecure/main.py
+          tests: B101
+
       # Verify directory scanning and excluded-paths independently.
       - bandit/execute:
           excluded-paths: tests/insecure

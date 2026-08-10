@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added an integration test for the `ini-path` parameter to verify that a Bandit INI configuration file is loaded and its `skips` setting is applied.
 * Added an integration test for the `confidence-level` parameter to verify that findings below the configured confidence threshold are filtered out.
 * Added an integration test for the `extra-args` parameter to verify that multiple additional Bandit CLI arguments are forwarded and applied correctly.
+* Added an integration test for the `tests` parameter to verify that Bandit runs only the selected test IDs.
 
 ## [0.0.7] - 2026-08-09
 
