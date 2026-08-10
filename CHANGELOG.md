@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added an integration test for the `config-file` parameter to verify that a Bandit YAML configuration file is loaded and its `skips` setting is applied.
+* Added an integration test for the `baseline` parameter to verify that findings already present in a Bandit JSON baseline report are ignored.
 
 ## [0.0.7] - 2026-08-09
 

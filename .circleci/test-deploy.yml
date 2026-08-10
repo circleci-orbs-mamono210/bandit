@@ -106,6 +106,12 @@ jobs:
             print(f"Scanned files: {sorted(filenames)}")
             PY
 
+      # Verify that findings already present in the baseline are ignored.
+      - bandit/execute:
+          baseline: reports/bandit.json
+          recursive: false
+          targets: tests/insecure/main.py
+
       - store_artifacts:
           path: reports
 
