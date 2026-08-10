@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added an integration test for the `baseline` parameter to verify that findings already present in a Bandit JSON baseline report are ignored.
 * Added an integration test for the `ini-path` parameter to verify that a Bandit INI configuration file is loaded and its `skips` setting is applied.
 * Added an integration test for the `confidence-level` parameter to verify that findings below the configured confidence threshold are filtered out.
+* Added an integration test for the `extra-args` parameter to verify that multiple additional Bandit CLI arguments are forwarded and applied correctly.
 
 ## [0.0.7] - 2026-08-09
 

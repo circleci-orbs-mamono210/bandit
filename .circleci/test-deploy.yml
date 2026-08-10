@@ -149,6 +149,13 @@ jobs:
           skips: B324
           targets: tests/insecure/main.py
 
+      # Verify that extra-args forwards multiple Bandit CLI arguments.
+      # B324 is the only HIGH severity finding, so this should exit 0.
+      - bandit/execute:
+          extra-args: "--severity-level high --skip B324"
+          recursive: false
+          targets: tests/insecure/main.py
+
       # Verify directory scanning and excluded-paths independently.
       - bandit/execute:
           excluded-paths: tests/insecure
