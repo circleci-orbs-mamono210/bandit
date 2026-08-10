@@ -131,6 +131,14 @@ jobs:
           severity-level: high
           targets: tests/insecure/main.py
 
+      # Verify that ini-path loads the committed Bandit INI configuration.
+      # The INI file skips B324, which is the only HIGH severity finding.
+      - bandit/execute:
+          ini-path: tests/config/.bandit
+          recursive: false
+          severity-level: high
+          targets: tests/insecure/main.py
+
       # Verify directory scanning and excluded-paths independently.
       - bandit/execute:
           excluded-paths: tests/insecure
