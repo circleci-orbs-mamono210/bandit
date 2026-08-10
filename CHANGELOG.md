@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8] - 2026-08-10
+
 ### Added
 
 * Added an integration test for the `config-file` parameter to verify that a Bandit YAML configuration file is loaded and its `skips` setting is applied.
@@ -91,7 +93,8 @@ Initial release of the Bandit CircleCI Orb.
 * Added Orb linting, packing, review and ShellCheck to the development pipeline.
 * Added production publishing from Semantic Versioning tags.
 
-[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.7...HEAD
+[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.8...HEAD
+[0.0.8]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.4...v0.0.5
