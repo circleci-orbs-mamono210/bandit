@@ -139,6 +139,16 @@ jobs:
           severity-level: high
           targets: tests/insecure/main.py
 
+      # Verify that confidence-level filters lower-confidence findings.
+      # B104 is MEDIUM severity / MEDIUM confidence.
+      # B324 is skipped and B101 is below the MEDIUM severity threshold.
+      - bandit/execute:
+          confidence-level: high
+          recursive: false
+          severity-level: medium
+          skips: B324
+          targets: tests/insecure/main.py
+
       # Verify directory scanning and excluded-paths independently.
       - bandit/execute:
           excluded-paths: tests/insecure
