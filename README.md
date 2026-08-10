@@ -134,7 +134,20 @@ Use `targets` to select files or directories.
     targets: src app scripts
 ```
 
-Targets are supplied as a space-separated string.
+Targets are supplied as a whitespace-separated string. The Orb splits the value into individual target arguments without performing shell pathname expansion.
+
+For example:
+
+```yaml
+- bandit/execute:
+    targets: src app scripts
+```
+
+is passed to Bandit as three separate targets.
+
+Shell quoting inside the `targets` value is not evaluated. As a result, a path containing whitespace cannot be represented as a single target with this parameter.
+
+Glob-like characters such as `*`, `?` and `[]` are passed to Bandit literally rather than being expanded by the shell.
 
 Use `recursive: false` when scanning a single file without recursive directory traversal.
 
@@ -365,16 +378,22 @@ Parameters:
 | `recursive`        | boolean |   `true` | Recursively scan directories                 |
 | `severity-level`   | enum    |    `all` | Minimum severity level                       |
 | `skips`            | string  |     `""` | Comma-separated test IDs to skip             |
-| `targets`          | string  |      `.` | Space-separated files or directories         |
+| `targets`          | string  |      `.` | Whitespace-separated files or directories    |
 | `tests`            | string  |     `""` | Comma-separated test IDs to run              |
 
 Options not directly exposed by the Orb can be passed with `extra-args`.
 
 ```yaml
 - bandit/execute:
-    extra-args: --verbose
+    extra-args: "--verbose --quiet"
     targets: src
 ```
+
+`extra-args` is split on whitespace and passed to Bandit as separate arguments. Shell pathname expansion is not performed.
+
+Shell quoting inside `extra-args` is not evaluated. Therefore, an option that requires one argument containing whitespace cannot be represented through `extra-args`.
+
+For commonly used Bandit options, prefer the dedicated Orb parameters when available.
 
 ## Executor
 
@@ -429,3 +448,4 @@ v1.2.3
 ## License
 
 This project is released under the [MIT License](LICENSE).
+

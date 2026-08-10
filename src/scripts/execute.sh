@@ -61,15 +61,14 @@ if is_true "${PARAM_EXIT_ZERO}"; then
   BANDIT_ARGS+=('--exit-zero')
 fi
 
-# Word splitting is intended here because extra-args may contain several flags.
-# shellcheck disable=SC2206
+EXTRA_ARGS=()
 if [ -n "${PARAM_EXTRA_ARGS}" ]; then
-  BANDIT_ARGS+=(${PARAM_EXTRA_ARGS})
+  read -r -a EXTRA_ARGS <<< "${PARAM_EXTRA_ARGS}"
+  BANDIT_ARGS+=("${EXTRA_ARGS[@]}")
 fi
 
-# Word splitting is intended here because targets may contain several paths.
-# shellcheck disable=SC2206
-TARGETS=(${PARAM_TARGETS})
+TARGETS=()
+read -r -a TARGETS <<< "${PARAM_TARGETS}"
 
 printf 'PARAM_RECURSIVE=%q\n' "${PARAM_RECURSIVE}"
 printf 'PARAM_EXIT_ZERO=%q\n' "${PARAM_EXIT_ZERO}"

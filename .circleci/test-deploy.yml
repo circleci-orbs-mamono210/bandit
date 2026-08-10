@@ -156,6 +156,40 @@ jobs:
           recursive: false
           targets: tests/insecure/main.py
 
+      # Verify that targets forwards multiple paths independently.
+      # B324 is skipped, so scanning both files should exit 0.
+      - bandit/execute:
+          recursive: false
+          severity-level: high
+          skips: B324
+          targets: "tests/clean/main.py tests/insecure/main.py"
+
+      # Prepare two paths that distinguish a literal target from shell glob
+      # expansion. literal[1].py is clean, while literal1.py contains B324.
+      - run:
+          name: Prepare literal glob target fixtures
+          command: |
+            set -euo pipefail
+
+            rm -rf /tmp/bandit-word-splitting
+            mkdir -p /tmp/bandit-word-splitting
+
+            cp \
+              tests/clean/main.py \
+              '/tmp/bandit-word-splitting/literal[1].py'
+
+            cp \
+              tests/insecure/main.py \
+              /tmp/bandit-word-splitting/literal1.py
+
+      # Verify that a glob-like target is passed literally.
+      # If the shell expands [1], literal1.py is scanned and B324 fails the
+      # step. The intended target literal[1].py is clean.
+      - bandit/execute:
+          recursive: false
+          severity-level: high
+          targets: "/tmp/bandit-word-splitting/literal[1].py"
+
       # Verify that tests limits Bandit to the selected test IDs.
       # Only B101 is selected, and it is below the HIGH severity threshold.
       - bandit/execute:
