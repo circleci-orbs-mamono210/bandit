@@ -37,8 +37,9 @@ parameters:
   extra-args:
     default: ''
     description: >
-      Extra arguments appended to the bandit invocation verbatim, for options
-      this command does not expose.
+      Extra arguments appended to the bandit invocation. Arguments are split
+      on whitespace, including spaces, tabs and newlines. Shell quoting is not
+      evaluated.
     type: string
   format:
     default: screen
@@ -80,7 +81,8 @@ parameters:
   targets:
     default: '.'
     description: >
-      Space separated list of source files or directories to scan.
+      Whitespace separated list of source files or directories to scan.
+      Spaces, tabs and newlines separate target arguments.
     type: string
   tests:
     default: ''

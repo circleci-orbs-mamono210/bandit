@@ -134,16 +134,19 @@ Use `targets` to select files or directories.
     targets: src app scripts
 ```
 
-Targets are supplied as a whitespace-separated string. The Orb splits the value into individual target arguments without performing shell pathname expansion.
+Targets are supplied as a whitespace-separated string. Spaces, tabs and newlines are treated as argument separators. The Orb splits the value into individual target arguments without performing shell pathname expansion.
 
-For example:
+For example, targets can be written across multiple lines using a YAML block scalar:
 
 ```yaml
 - bandit/execute:
-    targets: src app scripts
+    targets: |
+      src
+      app
+      scripts
 ```
 
-is passed to Bandit as three separate targets.
+This is passed to Bandit as three separate targets.
 
 Shell quoting inside the `targets` value is not evaluated. As a result, a path containing whitespace cannot be represented as a single target with this parameter.
 
@@ -364,22 +367,22 @@ Runs Bandit against the selected source files or directories.
 
 Parameters:
 
-| Parameter          | Type    |  Default | Description                                  |
-| ------------------ | ------- | -------: | -------------------------------------------- |
-| `baseline`         | string  |     `""` | JSON baseline report                         |
-| `confidence-level` | enum    |    `all` | Minimum confidence level                     |
-| `config-file`      | string  |     `""` | Bandit configuration file                    |
-| `excluded-paths`   | string  |     `""` | Comma-separated excluded paths               |
-| `exit-zero`        | boolean |  `false` | Exit successfully when findings are reported |
-| `extra-args`       | string  |     `""` | Additional Bandit command-line arguments     |
-| `format`           | enum    | `screen` | Report format                                |
-| `ini-path`         | string  |     `""` | Path to a `.bandit` file                     |
-| `output-file`      | string  |     `""` | Report output path                           |
-| `recursive`        | boolean |   `true` | Recursively scan directories                 |
-| `severity-level`   | enum    |    `all` | Minimum severity level                       |
-| `skips`            | string  |     `""` | Comma-separated test IDs to skip             |
-| `targets`          | string  |      `.` | Whitespace-separated files or directories    |
-| `tests`            | string  |     `""` | Comma-separated test IDs to run              |
+| Parameter          | Type    |  Default | Description                                      |
+| ------------------ | ------- | -------: | ------------------------------------------------ |
+| `baseline`         | string  |     `""` | JSON baseline report                             |
+| `confidence-level` | enum    |    `all` | Minimum confidence level                         |
+| `config-file`      | string  |     `""` | Bandit configuration file                        |
+| `excluded-paths`   | string  |     `""` | Comma-separated excluded paths                   |
+| `exit-zero`        | boolean |  `false` | Exit successfully when findings are reported     |
+| `extra-args`       | string  |     `""` | Additional whitespace-separated Bandit arguments |
+| `format`           | enum    | `screen` | Report format                                    |
+| `ini-path`         | string  |     `""` | Path to a `.bandit` file                         |
+| `output-file`      | string  |     `""` | Report output path                               |
+| `recursive`        | boolean |   `true` | Recursively scan directories                     |
+| `severity-level`   | enum    |    `all` | Minimum severity level                           |
+| `skips`            | string  |     `""` | Comma-separated test IDs to skip                 |
+| `targets`          | string  |      `.` | Whitespace-separated files or directories        |
+| `tests`            | string  |     `""` | Comma-separated test IDs to run                  |
 
 Options not directly exposed by the Orb can be passed with `extra-args`.
 
@@ -389,7 +392,19 @@ Options not directly exposed by the Orb can be passed with `extra-args`.
     targets: src
 ```
 
-`extra-args` is split on whitespace and passed to Bandit as separate arguments. Shell pathname expansion is not performed.
+`extra-args` is split on whitespace and passed to Bandit as separate arguments. Spaces, tabs and newlines are accepted as separators. Shell pathname expansion is not performed.
+
+For example, arguments can be written across multiple lines:
+
+```yaml
+- bandit/execute:
+    extra-args: |
+      --severity-level high
+      --skip B324
+    targets: src
+```
+
+This passes `--severity-level`, `high`, `--skip` and `B324` as four separate Bandit command-line arguments.
 
 Shell quoting inside `extra-args` is not evaluated. Therefore, an option that requires one argument containing whitespace cannot be represented through `extra-args`.
 
@@ -448,4 +463,3 @@ v1.2.3
 ## License
 
 This project is released under the [MIT License](LICENSE).
-

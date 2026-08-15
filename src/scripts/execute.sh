@@ -63,12 +63,17 @@ fi
 
 EXTRA_ARGS=()
 if [ -n "${PARAM_EXTRA_ARGS}" ]; then
-  read -r -a EXTRA_ARGS <<< "${PARAM_EXTRA_ARGS}"
+  while read -r -a LINE_ARGS; do
+    EXTRA_ARGS+=("${LINE_ARGS[@]}")
+  done <<< "${PARAM_EXTRA_ARGS}"
+
   BANDIT_ARGS+=("${EXTRA_ARGS[@]}")
 fi
 
 TARGETS=()
-read -r -a TARGETS <<< "${PARAM_TARGETS}"
+while read -r -a LINE_TARGETS; do
+  TARGETS+=("${LINE_TARGETS[@]}")
+done <<< "${PARAM_TARGETS}"
 
 printf 'PARAM_RECURSIVE=%q\n' "${PARAM_RECURSIVE}"
 printf 'PARAM_EXIT_ZERO=%q\n' "${PARAM_EXIT_ZERO}"

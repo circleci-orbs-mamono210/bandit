@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.10] - 2026-08-15
+
+### Added
+
+* Added integration coverage for multiline `targets` to verify that every line is passed to Bandit as an independent target.
+* Added integration coverage for multiline `extra-args` to verify that arguments on subsequent lines are forwarded correctly.
+
+### Changed
+
+* Changed `targets` and `extra-args` parsing so that spaces, tabs and newlines are treated as whitespace separators.
+* Updated the Orb parameter documentation and README to document multiline `targets` and `extra-args`.
+* Preserved the existing behavior where shell quoting is not evaluated and shell pathname expansion is not performed.
+
 ## [0.0.9] - 2026-08-10
 
 ### Added
@@ -104,7 +117,8 @@ Initial release of the Bandit CircleCI Orb.
 * Added Orb linting, packing, review and ShellCheck to the development pipeline.
 * Added production publishing from Semantic Versioning tags.
 
-[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.9...HEAD
+[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.10...HEAD
+[0.0.10]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.7...v0.0.8
 [0.0.7]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.6...v0.0.7
@@ -113,4 +127,3 @@ Initial release of the Bandit CircleCI Orb.
 [0.0.4]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/circleci-orbs-mamono210/bandit/releases/tag/v0.0.2
-

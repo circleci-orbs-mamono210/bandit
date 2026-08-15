@@ -156,6 +156,15 @@ jobs:
           recursive: false
           targets: tests/insecure/main.py
 
+      # Verify that multiline extra-args treats newlines as whitespace.
+      # If only the first line is processed, B324 causes the step to fail.
+      - bandit/execute:
+          extra-args: |
+            --severity-level high
+            --skip B324
+          recursive: false
+          targets: tests/insecure/main.py
+
       # Verify that targets forwards multiple paths independently.
       # B324 is skipped, so scanning both files should exit 0.
       - bandit/execute:
@@ -163,6 +172,86 @@ jobs:
           severity-level: high
           skips: B324
           targets: "tests/clean/main.py tests/insecure/main.py"
+
+      # Verify that multiline targets forwards every line independently.
+      - bandit/execute:
+          exit-zero: true
+          format: json
+          output-file: /tmp/bandit-multiline-targets.json
+          recursive: false
+          targets: |
+            tests/clean/main.py
+            tests/insecure/main.py
+
+      - run:
+          name: Verify multiline targets
+          command: |
+            set -euo pipefail
+
+            test -s /tmp/bandit-multiline-targets.json
+
+            python - \<<'PY'
+            import json
+            from pathlib import Path
+
+            report_path = Path(
+                "/tmp/bandit-multiline-targets.json"
+            )
+            report = json.loads(
+                report_path.read_text(encoding="utf-8")
+            )
+
+            errors = report.get("errors", [])
+            if errors:
+                raise SystemExit(
+                    f"Bandit reported scan errors: {errors}"
+                )
+
+            metrics = report.get("metrics", {})
+            scanned_files = {
+                Path(filename).as_posix()
+                for filename in metrics
+                if filename != "_totals"
+            }
+
+            expected_files = {
+                "tests/clean/main.py",
+                "tests/insecure/main.py",
+            }
+
+            missing_files = {
+                expected
+                for expected in expected_files
+                if not any(
+                    filename.endswith(expected)
+                    for filename in scanned_files
+                )
+            }
+
+            if missing_files:
+                raise SystemExit(
+                    "Multiline targets were not all scanned. "
+                    f"Missing: {sorted(missing_files)}; "
+                    f"scanned: {sorted(scanned_files)}"
+                )
+
+            test_ids = {
+                result.get("test_id")
+                for result in report.get("results", [])
+                if result.get("test_id")
+            }
+
+            if "B324" not in test_ids:
+                raise SystemExit(
+                    "Expected B324 from the second multiline target, "
+                    f"but detected: {sorted(test_ids)}"
+                )
+
+            print(
+                "Verified multiline targets: "
+                f"{sorted(expected_files)}"
+            )
+            PY
 
       # Prepare two paths that distinguish a literal target from shell glob
       # expansion. literal[1].py is clean, while literal1.py contains B324.
