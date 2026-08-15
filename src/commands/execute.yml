@@ -44,8 +44,18 @@ parameters:
   format:
     default: screen
     description: >
-      Output format (bandit '--format').
-    enum: ["csv", "custom", "html", "json", "screen", "txt", "xml", "yaml"]
+      Output format (bandit '--format'). The 'sarif' format requires Bandit
+      to be installed with the 'sarif' extra.
+    enum:
+      - csv
+      - custom
+      - html
+      - json
+      - sarif
+      - screen
+      - txt
+      - xml
+      - yaml
     type: enum
   ini-path:
     default: ''

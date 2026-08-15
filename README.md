@@ -14,7 +14,7 @@ This Orb provides:
 * Severity and confidence filtering
 * Test inclusion and exclusion
 * Baseline comparison
-* JSON, HTML, XML and other report formats
+* JSON, SARIF, HTML, XML and other report formats
 * Support for Bandit configuration files and `pyproject.toml`
 
 ## Orb Registry
@@ -122,7 +122,7 @@ Multiple installation extras can be supplied as a comma-separated string.
 
 ```yaml
 - bandit/install:
-    extras: toml
+    extras: toml,sarif
 ```
 
 ## Scanning Selected Paths
@@ -263,10 +263,50 @@ Supported report formats are:
 * `custom`
 * `html`
 * `json`
+* `sarif`
 * `screen`
 * `txt`
 * `xml`
 * `yaml`
+
+The `sarif` format requires Bandit to be installed with the `sarif` extra.
+
+## Saving a SARIF Report
+
+Bandit's SARIF formatter uses optional dependencies. Install Bandit with the `sarif` extra before using `format: sarif`.
+
+```yaml
+version: 2.1
+
+orbs:
+  bandit: orbss/bandit@x.y.z
+
+jobs:
+  execute-bandit:
+    executor: bandit/default
+    steps:
+      - checkout
+
+      - bandit/install:
+          extras: sarif
+          version: "1.9.4"
+
+      - bandit/execute:
+          exit-zero: true
+          format: sarif
+          output-file: reports/bandit.sarif
+          targets: src
+
+      - store_artifacts:
+          path: reports
+
+workflows:
+  bandit:
+    jobs:
+      - execute-bandit
+```
+
+The generated file uses SARIF 2.1.0 and can be consumed by tools that support SARIF reports.
 
 ## Saving a Report and Enforcing a Quality Gate
 
@@ -350,7 +390,7 @@ Parameters:
 
 | Parameter | Type   | Default | Description                                                  |
 | --------- | ------ | ------: | ------------------------------------------------------------ |
-| `extras`  | string |    `""` | Comma-separated pip extras, such as `toml`                   |
+| `extras`  | string |    `""` | Comma-separated pip extras, such as `toml` or `sarif`        |
 | `version` | string |    `""` | Bandit version to install; empty installs the latest release |
 
 Example:

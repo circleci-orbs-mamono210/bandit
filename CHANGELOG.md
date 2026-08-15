@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.11] - 2026-08-15
+
+### Added
+
+* Added `sarif` to the supported `bandit/execute` report formats.
+* Added an integration test that generates and parses a Bandit SARIF report and verifies its SARIF version, Bandit tool metadata and `B324` finding.
+* Added documentation and an example for generating SARIF reports with the Bandit `sarif` extra.
+
 ## [0.0.10] - 2026-08-15
 
 ### Added
@@ -117,7 +125,8 @@ Initial release of the Bandit CircleCI Orb.
 * Added Orb linting, packing, review and ShellCheck to the development pipeline.
 * Added production publishing from Semantic Versioning tags.
 
-[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.10...HEAD
+[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.11...HEAD
+[0.0.11]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.8...v0.0.9
 [0.0.8]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.7...v0.0.8

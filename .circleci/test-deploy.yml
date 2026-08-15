@@ -29,7 +29,7 @@ jobs:
       - checkout
 
       - bandit/install:
-          extras: toml
+          extras: toml,sarif
           version: "1.9.4"
 
       # Generate a JSON report from the committed insecure fixture.
@@ -104,6 +104,90 @@ jobs:
             print(f"Verified {len(results)} finding(s)")
             print(f"Detected test IDs: {sorted(test_ids)}")
             print(f"Scanned files: {sorted(filenames)}")
+            PY
+
+      # Generate a SARIF report from the committed insecure fixture.
+      - bandit/execute:
+          exit-zero: true
+          format: sarif
+          output-file: reports/bandit.sarif
+          recursive: false
+          targets: tests/insecure/main.py
+
+      - run:
+          name: Verify Bandit SARIF report
+          command: |
+            set -euo pipefail
+
+            test -s reports/bandit.sarif
+
+            python - \<<'PY'
+            import json
+            from pathlib import Path
+
+            report_path = Path("reports/bandit.sarif")
+            report = json.loads(
+                report_path.read_text(encoding="utf-8")
+            )
+
+            version = report.get("version")
+            if version != "2.1.0":
+                raise SystemExit(
+                    "Expected SARIF version 2.1.0, "
+                    f"but detected: {version!r}"
+                )
+
+            runs = report.get("runs", [])
+            if not runs:
+                raise SystemExit(
+                    "Bandit SARIF report contains no runs"
+                )
+
+            driver = (
+                runs[0]
+                .get("tool", {})
+                .get("driver", {})
+            )
+
+            if driver.get("name") != "Bandit":
+                raise SystemExit(
+                    "Expected SARIF tool driver 'Bandit', "
+                    f"but detected: {driver!r}"
+                )
+
+            results = []
+            for run in runs:
+                results.extend(run.get("results") or [])
+
+            if not results:
+                raise SystemExit(
+                    "Expected at least one Bandit finding "
+                    "in the SARIF report"
+                )
+
+            rule_ids = {
+                result.get("ruleId")
+                for result in results
+                if result.get("ruleId")
+            }
+
+            if "B324" not in rule_ids:
+                raise SystemExit(
+                    "Expected B324 in SARIF findings, "
+                    f"but detected: {sorted(rule_ids)}"
+                )
+
+            print(f"SARIF version: {version}")
+            print(
+                "Bandit version: "
+                f"{driver.get('version')}"
+            )
+            print(
+                f"Verified {len(results)} SARIF finding(s)"
+            )
+            print(
+                f"Detected rule IDs: {sorted(rule_ids)}"
+            )
             PY
 
       # Verify that findings already present in the baseline are ignored.
