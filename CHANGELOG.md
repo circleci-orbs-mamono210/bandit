@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.12] - 2026-08-15
+
+### Added
+
+* Added an integration test for `bandit/install`'s `version` parameter that verifies the installed Bandit package version through Python package metadata.
+* Added an integration test for `bandit/install`'s `extras` parameter that verifies the dependencies supplied by Bandit's `sarif` extra are installed.
+* Added an end-to-end `install.extras` test that generates and parses a SARIF report after installing Bandit with the `sarif` extra.
+
 ## [0.0.11] - 2026-08-15
 
 ### Added
@@ -125,7 +133,8 @@ Initial release of the Bandit CircleCI Orb.
 * Added Orb linting, packing, review and ShellCheck to the development pipeline.
 * Added production publishing from Semantic Versioning tags.
 
-[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.11...HEAD
+[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.12...HEAD
+[0.0.12]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.10...v0.0.11
 [0.0.10]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.9...v0.0.10
 [0.0.9]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.8...v0.0.9

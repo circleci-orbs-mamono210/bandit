@@ -382,13 +382,121 @@ jobs:
     steps:
       - checkout
 
+      # Verify that install.version installs the requested Bandit release.
       - bandit/install:
-          extras: toml
           version: "1.9.4"
 
+      - run:
+          name: Verify installed Bandit version
+          command: |
+            set -euo pipefail
+
+            python - \<<'PY'
+            from importlib.metadata import version
+
+            expected = "1.9.4"
+            installed = version("bandit")
+
+            if installed != expected:
+                raise SystemExit(
+                    f"Expected Bandit {expected}, "
+                    f"but installed {installed}"
+                )
+
+            print(f"Verified Bandit version: {installed}")
+            PY
+
+      # Verify that the installed Bandit command works normally.
       - bandit/execute:
           recursive: false
           targets: tests/clean/main.py
+
+      # Verify that install.extras installs Bandit's SARIF dependencies.
+      # Reinstall the same pinned release with the sarif extra enabled.
+      - bandit/install:
+          extras: sarif
+          version: "1.9.4"
+
+      - run:
+          name: Verify SARIF extra dependencies
+          command: |
+            set -euo pipefail
+
+            python - \<<'PY'
+            import importlib.util
+
+            modules = (
+                "sarif_om",
+                "jschema_to_python",
+            )
+
+            missing = [
+                module
+                for module in modules
+                if importlib.util.find_spec(module) is None
+            ]
+
+            if missing:
+                raise SystemExit(
+                    "Missing dependencies installed by "
+                    f"Bandit's sarif extra: {missing}"
+                )
+
+            print(
+                "Verified SARIF extra dependencies: "
+                + ", ".join(modules)
+            )
+            PY
+
+      # Exercise the optional functionality supplied by the sarif extra.
+      - bandit/execute:
+          exit-zero: true
+          format: sarif
+          output-file: /tmp/bandit-install-extra.sarif
+          recursive: false
+          targets: tests/insecure/main.py
+
+      - run:
+          name: Verify SARIF extra functionality
+          command: |
+            set -euo pipefail
+
+            test -s /tmp/bandit-install-extra.sarif
+
+            python - \<<'PY'
+            import json
+            from pathlib import Path
+
+            report_path = Path(
+                "/tmp/bandit-install-extra.sarif"
+            )
+            report = json.loads(
+                report_path.read_text(encoding="utf-8")
+            )
+
+            runs = report.get("runs", [])
+            if not runs:
+                raise SystemExit(
+                    "SARIF report contains no runs"
+                )
+
+            driver = (
+                runs[0]
+                .get("tool", {})
+                .get("driver", {})
+            )
+
+            if driver.get("name") != "Bandit":
+                raise SystemExit(
+                    "Expected SARIF tool driver 'Bandit', "
+                    f"but detected: {driver!r}"
+                )
+
+            print(
+                "Verified install.extras SARIF "
+                "functionality"
+            )
+            PY
 
   resource-class-test:
     executor:
