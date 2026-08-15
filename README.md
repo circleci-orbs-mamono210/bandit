@@ -23,6 +23,14 @@ The published Orb, parameter reference and generated examples are available in t
 
 https://circleci.com/developer/orbs/orb/orbss/bandit
 
+The first stable release is:
+
+```text
+orbss/bandit@1.0.0
+```
+
+Version `1.0.0` marks the current public command, parameter and executor interface as stable.
+
 ## Quick Start
 
 The default executor uses a CircleCI Python convenience image. Bandit is not preinstalled, so run `bandit/install` before `bandit/execute`.

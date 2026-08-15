@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-15
+
+### Changed
+
+* Declared the current Bandit Orb public API and feature set stable and released the first stable version.
+* Established the existing `bandit/install`, `bandit/execute` and `bandit/default` interfaces as the stable `1.x` API.
+
+This release contains no functional changes from `0.0.14`.
+
 ## [0.0.14] - 2026-08-15
 
 ### Changed
@@ -145,7 +154,8 @@ Initial release of the Bandit CircleCI Orb.
 * Added Orb linting, packing, review and ShellCheck to the development pipeline.
 * Added production publishing from Semantic Versioning tags.
 
-[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.14...HEAD
+[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.14...v1.0.0
 [0.0.14]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.13...v0.0.14
 [0.0.13]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.11...v0.0.12
