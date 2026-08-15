@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.14] - 2026-08-15
+
+### Changed
+
+* Updated the CircleCI ShellCheck Orb used by the development pipeline from `circleci/shellcheck@3.1` to `circleci/shellcheck@3.4.0`.
+
 ## [0.0.13] - 2026-08-15
 
 ### Changed
@@ -139,7 +145,8 @@ Initial release of the Bandit CircleCI Orb.
 * Added Orb linting, packing, review and ShellCheck to the development pipeline.
 * Added production publishing from Semantic Versioning tags.
 
-[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.13...HEAD
+[Unreleased]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.14...HEAD
+[0.0.14]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.13...v0.0.14
 [0.0.13]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.12...v0.0.13
 [0.0.12]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.11...v0.0.12
 [0.0.11]: https://github.com/circleci-orbs-mamono210/bandit/compare/v0.0.10...v0.0.11
